@@ -19,10 +19,23 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate form submission
-    alert("Thanks for your interest! In a real environment, this would send an email to jadesantiagopereira55@gmail.com.");
+    setStatus('sending');
+    try {
+      const res = await fetch('https://formspree.io/f/xwlpjzpr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(formState),
+      });
+      if (!res.ok) throw new Error('Request failed');
+      setStatus('success');
+      setFormState({ name: '', business: '', email: '', country: '', needs: '', budget: '', message: '' });
+    } catch {
+      setStatus('error');
+    }
   };
 
   return (
@@ -125,9 +138,19 @@ const Contact = () => {
               </div>
 
               <div className="pt-4 flex flex-col items-center">
-                <button type="submit" className="w-full py-4 sm:py-5 bg-foreground text-background font-bold uppercase tracking-widest hover:bg-foreground/90 transition-colors mb-3">
-                  Get My Free Quote
+                <button type="submit" disabled={status === 'sending'} className="disabled:opacity-60 disabled:cursor-not-allowed w-full py-4 sm:py-5 bg-foreground text-background font-bold uppercase tracking-widest hover:bg-foreground/90 transition-colors mb-3">
+                  {status === 'sending' ? 'Sending...' : 'Get My Free Quote'}
                 </button>
+                {status === 'success' && (
+                  <p role="status" className="text-sm text-center font-medium text-green-700 mb-3">
+                    Thank you! Your message was sent. I'll get back to you soon.
+                  </p>
+                )}
+                {status === 'error' && (
+                  <p role="alert" className="text-sm text-center font-medium text-red-700 mb-3">
+                    Something went wrong. Please try again or email me directly.
+                  </p>
+                )}
                 <span className="text-xs text-center text-foreground/50">No obligation. Just a clear estimate based on your project.</span>
               </div>
             </form>
