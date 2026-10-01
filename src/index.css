@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    width: 100%;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-foreground selection:text-background;
+    font-variant-ligatures: none; /* Good for coding fonts */
+  }
+
+  ::selection {
+    @apply bg-foreground text-background;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-background/70 backdrop-blur-md border border-foreground/5 shadow-sm;
+  }
+}
